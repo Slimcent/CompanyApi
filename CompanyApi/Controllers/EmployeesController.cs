@@ -86,5 +86,54 @@ namespace CompanyApi.Controllers
             return CreatedAtRoute("GetEmployeeForCompany",
                 new { companyId, id = employeeToReturn.Id }, employeeToReturn);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid id)
+        {
+            var company = _unitOfWork.Company.GetCompany(companyId, trackChanges: false);
+            if (company == null)
+            {
+                _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
+            return NotFound();
+            }
+            var employeeForCompany = _unitOfWork.Employee.GetEmployee(companyId, id,
+           trackChanges: false);
+            if (employeeForCompany == null)
+            {
+                _logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
+                return NotFound();
+            }
+            _unitOfWork.Employee.DeleteEmployee(employeeForCompany);
+            _unitOfWork.Save();
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeUpdateDto employee)
+        {
+            if (employee == null)
+            {
+                _logger.LogError("Employee object sent from client is null.");
+                return BadRequest("Employee object is null");
+            }
+            var company = _unitOfWork.Company.GetCompany(companyId, trackChanges: false);
+            if (company == null)
+            {
+                _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
+            return NotFound();
+            }
+            var employeeEntity = _unitOfWork.Employee.GetEmployee(companyId, id, trackChanges:
+           true);
+            if (employeeEntity == null)
+            {
+                _logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
+                return NotFound();
+            }
+            _mapper.Map(employee, employeeEntity);
+            _unitOfWork.Save();
+            return NoContent();
+        }
+
     }
 }
