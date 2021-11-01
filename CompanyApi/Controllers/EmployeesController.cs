@@ -68,6 +68,13 @@ namespace CompanyApi.Controllers
                 _logger.LogError("Employee object sent from client is null.");
                 return BadRequest("Employee object is null");
             }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the Employee object");
+                return UnprocessableEntity(ModelState);
+            }
+
             var company = _unitOfWork.Company.GetCompany(companyId, trackChanges: false);
             if (company == null)
             {
@@ -116,6 +123,11 @@ namespace CompanyApi.Controllers
             {
                 _logger.LogError("Employee object sent from client is null.");
                 return BadRequest("Employee object is null");
+            }
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the EmployeeForUpdateDto object");
+                return UnprocessableEntity(ModelState);
             }
             var company = _unitOfWork.Company.GetCompany(companyId, trackChanges: false);
             if (company == null)

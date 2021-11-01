@@ -63,6 +63,13 @@ namespace CompanyApi.Controllers
                 _logger.LogError("Company object sent from client is null.");
                 return BadRequest("Companyo object is null");
             }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the Company object");
+                return UnprocessableEntity(ModelState);
+            }
+
             var companyEntity = _mapper.Map<Company>(company);
             _unitOfWork.Company.AddCompany(companyEntity);
             _unitOfWork.Save();
