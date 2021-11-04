@@ -91,8 +91,7 @@ namespace CompanyApi.Controllers
 
             var employeeToReturn = _mapper.Map<EmployeeDto>(employeeEntity);
 
-            return CreatedAtRoute("GetEmployeeForCompany",
-                new { companyId, id = employeeToReturn.Id }, employeeToReturn);
+            return CreatedAtRoute("EmployeeById", new { companyId, id = employeeToReturn.Id }, employeeToReturn);
         }
 
         [HttpDelete("{id}")]

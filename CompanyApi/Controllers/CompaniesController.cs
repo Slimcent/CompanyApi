@@ -65,7 +65,7 @@ namespace CompanyApi.Controllers
             }
             if (!ModelState.IsValid)
             {
-                _logger.LogError("Invalid model state for the CompanyForCreationDto object");
+                _logger.LogError("Invalid model state for the Company object");
                 return UnprocessableEntity(ModelState);
             }
             var companyEntity = _mapper.Map<Company>(company);
