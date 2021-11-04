@@ -6,6 +6,7 @@ using Entities.Models;
 using Entities.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +30,10 @@ namespace CompanyApi.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
-
         {
+            if (!employeeParameters.ValidAgeRange)
+                return BadRequest("Max age can't be less than min age.");
+
             var company = await _unitOfWork.Company.GetCompanyAsync(companyId, trackChanges: false);
             if (company == null)
             {
@@ -39,6 +42,8 @@ namespace CompanyApi.Controllers
             }
 
             var employeesFromDb = await _unitOfWork.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(employeesFromDb.PageData));
 
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
             return Ok(employeesDto);
