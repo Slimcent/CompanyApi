@@ -1,4 +1,3 @@
-using CompanyApi.ActionFilters;
 using CompanyApi.Extensions;
 using Contract;
 using Entities.DataTransferObjects;
@@ -42,9 +41,6 @@ namespace CompanyApi
             services.ConfigureSqlContext(Configuration);
             services.ConfigureUnitOfWork();
             services.AddAutoMapper(typeof(MappingProfile));
-            services.AddScoped<ValidationAttribute>();
-            services.AddScoped<ValidateCompanyExists>();
-            services.AddScoped<ValidateEmployeeExists>();
             services.AddControllers(config =>
             {
                 config.RespectBrowserAcceptHeader = true;

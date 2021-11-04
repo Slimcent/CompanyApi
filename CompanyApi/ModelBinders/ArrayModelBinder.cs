@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CompanyApi.ModelBinders
 {
-    public class ArrayModelBinder
+    public class ArrayModelBinder : IModelBinder
     {
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
