@@ -18,5 +18,7 @@
         }
 
         public string OrderBy { get; set; } // For Sorting
+
+        public string Fields { get; set; } // Data Shaping
     }
 }

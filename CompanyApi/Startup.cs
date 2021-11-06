@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Repository.DataShaping;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -45,10 +46,19 @@ namespace CompanyApi
             services.AddScoped<ValidationFiltering>();
             services.AddScoped<ValidateCompanyExists>();
             services.AddScoped<ValidateEmployeeCompanyExists>();
+            services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
+            services.AddScoped<ValidateMediaTypeAttribute>();
+            services.AddCustomMediaTypes();
+            services.ConfigureResponseCaching();
+            services.ConfigureHttpCacheHeaders();
             services.AddControllers(config =>
             {
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+                {
+                    Duration = 120
+                });
             }).AddXmlDataContractSerializerFormatters()
               .AddCustomCSVFormatter();
             services.Configure<ApiBehaviorOptions>(options =>
@@ -81,6 +91,11 @@ namespace CompanyApi
             {
                 ForwardedHeaders = ForwardedHeaders.All
             });
+
+            app.UseResponseCaching();
+
+            app.UseHttpCacheHeaders();
+
             app.UseRouting();
 
             app.UseAuthorization();

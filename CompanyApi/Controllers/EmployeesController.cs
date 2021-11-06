@@ -21,14 +21,19 @@ namespace CompanyApi.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
-        public EmployeesController(IUnitOfWork unitOfWork, ILoggerManager logger, IMapper mapper)
+        private readonly IDataShaper<EmployeeDto> _dataShaper;
+
+        public EmployeesController(IUnitOfWork unitOfWork, ILoggerManager logger, IMapper mapper, IDataShaper<EmployeeDto> dataShaper)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
+            _dataShaper = dataShaper;
         }
 
         [HttpGet]
+        [HttpHead]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
             if (!employeeParameters.ValidAgeRange)
@@ -46,7 +51,7 @@ namespace CompanyApi.Controllers
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(employeesFromDb.PageData));
 
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
-            return Ok(employeesDto);
+            return Ok(_dataShaper.ShapeData(employeesDto, employeeParameters.Fields));
         }
 
         [HttpGet("{id}", Name = "EmployeeById")]

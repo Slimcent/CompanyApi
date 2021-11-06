@@ -4,6 +4,7 @@ using CompanyApi.ModelBinders;
 using Contract;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,18 @@ namespace CompanyApi.Controllers
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
-
         }
-        [HttpGet]
+
+
+        [HttpOptions]
+        public IActionResult GetCompaniesOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
+        }
+
+        [HttpGet(Name = "GetCompanies")]
+        [ResponseCache(CacheProfileName = "120SecondsDuration")]
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _unitOfWork.Company.GetAllCompaniesAsync(trackChanges: false);
@@ -41,6 +51,8 @@ namespace CompanyApi.Controllers
         }
 
         [HttpGet("{id}", Name = "CompanyById")]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+        [HttpCacheValidation(MustRevalidate = false)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
             var company = await _unitOfWork.Company.GetCompanyAsync(id, trackChanges: false);
@@ -56,7 +68,7 @@ namespace CompanyApi.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateCompany")]
         [ServiceFilter(typeof(ValidationFiltering))]
         public async Task<IActionResult> CreateCompany([FromBody]PostCompanyDto company)
         {
