@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using CompanyApi.ActionFilters;
 using CompanyApi.Extensions;
 using Contract;
@@ -51,6 +52,10 @@ namespace CompanyApi
             services.AddCustomMediaTypes();
             services.ConfigureResponseCaching();
             services.ConfigureHttpCacheHeaders();
+            services.ConfigureVersioning();
+            //services.AddMemoryCache();
+            //services.ConfigureRateLimitingOptions();
+            //services.AddHttpContextAccessor();
             services.AddControllers(config =>
             {
                 config.RespectBrowserAcceptHeader = true;
@@ -95,6 +100,8 @@ namespace CompanyApi
             app.UseResponseCaching();
 
             app.UseHttpCacheHeaders();
+
+            //app.UseIpRateLimiting();
 
             app.UseRouting();
 
