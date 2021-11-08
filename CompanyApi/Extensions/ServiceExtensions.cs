@@ -1,10 +1,12 @@
-﻿using AspNetCoreRateLimit;
+﻿
+using AspNetCoreRateLimit;
 using CompanyApi.Formater;
 using Contract;
 using Entities.Models;
 using LoggerService;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -112,6 +114,22 @@ namespace CompanyApi.Extensions
                 opt.DefaultApiVersion = new ApiVersion(1, 0);
                 opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
+        }
+
+        public static void ConfigureIdentity(this IServiceCollection services)
+        {
+            var builder = services.AddIdentityCore<User>(o =>
+            {
+                o.Password.RequireDigit = true;
+                o.Password.RequireLowercase = false;
+                o.Password.RequireUppercase = false;
+                o.Password.RequireNonAlphanumeric = false;
+                o.Password.RequiredLength = 10;
+                o.User.RequireUniqueEmail = true;
+            });
+            builder = new IdentityBuilder(builder.UserType, typeof(Role), builder.Services);
+            builder.AddEntityFrameworkStores<RepositoryContext>()
+            .AddDefaultTokenProviders();
         }
 
     }

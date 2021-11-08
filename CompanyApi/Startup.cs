@@ -56,6 +56,8 @@ namespace CompanyApi
             //services.AddMemoryCache();
             //services.ConfigureRateLimitingOptions();
             //services.AddHttpContextAccessor();
+            services.AddAuthentication();
+            services.ConfigureIdentity();
             services.AddControllers(config =>
             {
                 config.RespectBrowserAcceptHeader = true;
@@ -104,6 +106,8 @@ namespace CompanyApi
             //app.UseIpRateLimiting();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

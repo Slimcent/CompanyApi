@@ -1,16 +1,21 @@
 ﻿using Entities.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Entities.Models
 {
-    public class RepositoryContext : DbContext
+    public class RepositoryContext : IdentityDbContext<User, Role, string>
+
     {
         public RepositoryContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
-        { 
-            modelBuilder.ApplyConfiguration(new CompanyData()); 
-            modelBuilder.ApplyConfiguration(new EmployeeData()); 
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfiguration(new CompanyData());
+            modelBuilder.ApplyConfiguration(new EmployeeData());
+            modelBuilder.ApplyConfiguration(new RoleData());
         }
 
         public DbSet<Company> Companies { get; set; }
