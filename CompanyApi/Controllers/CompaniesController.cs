@@ -5,6 +5,7 @@ using Contract;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace CompanyApi.Controllers
     [ApiVersion("1.0")]
     [Route("api/companies")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "v1")]
     public class CompaniesController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -39,6 +41,9 @@ namespace CompanyApi.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Gets the list of all companies
+        /// </summary>
         [HttpGet(Name = "GetCompanies")]
         [ResponseCache(CacheProfileName = "120SecondsDuration")]
         public async Task<IActionResult> GetCompanies()

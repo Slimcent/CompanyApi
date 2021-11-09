@@ -58,6 +58,8 @@ namespace CompanyApi
             //services.AddHttpContextAccessor();
             services.AddAuthentication();
             services.ConfigureIdentity();
+            services.ConfigureSwagger();
+            //services.ConfigureJWT(Configuration);
             services.AddControllers(config =>
             {
                 config.RespectBrowserAcceptHeader = true;
@@ -86,6 +88,14 @@ namespace CompanyApi
             {
                 app.UseHsts();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(s =>
+            {
+                s.SwaggerEndpoint("/swagger/v1/swagger.json", "Slimcent API v1");
+                s.SwaggerEndpoint("/swagger/v2/swagger.json", "Slimcent API v2");
+            });
+
             app.ConfigureExceptionHandler(logger);
 
             app.UseHttpsRedirection();

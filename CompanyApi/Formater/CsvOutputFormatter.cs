@@ -1,6 +1,7 @@
 ﻿using Entities.DataTransferObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +13,7 @@ namespace CompanyApi.Formater
     {
         public CsvOutputFormatter()
         {
-            //SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/csv"));
+            SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/csv"));
             SupportedEncodings.Add(Encoding.UTF8);
             SupportedEncodings.Add(Encoding.Unicode);
         }
