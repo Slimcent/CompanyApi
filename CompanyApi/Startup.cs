@@ -1,5 +1,6 @@
 using AspNetCoreRateLimit;
 using CompanyApi.ActionFilters;
+using CompanyApi.Authentication;
 using CompanyApi.Extensions;
 using Contract;
 using Entities.DataTransferObjects;
@@ -59,7 +60,8 @@ namespace CompanyApi
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureSwagger();
-            //services.ConfigureJWT(Configuration);
+            services.ConfigureJWT(Configuration);
+            services.AddScoped<IAuthenticationManager, AuthenticationManager>();
             services.AddControllers(config =>
             {
                 config.RespectBrowserAcceptHeader = true;

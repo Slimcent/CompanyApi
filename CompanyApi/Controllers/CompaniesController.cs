@@ -44,7 +44,7 @@ namespace CompanyApi.Controllers
         /// <summary>
         /// Gets the list of all companies
         /// </summary>
-        [HttpGet(Name = "GetCompanies")]
+        [HttpGet(Name = "GetCompanies"), Authorize(Roles = "Manager")]
         [ResponseCache(CacheProfileName = "120SecondsDuration")]
         public async Task<IActionResult> GetCompanies()
         {

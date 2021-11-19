@@ -151,9 +151,9 @@ namespace CompanyApi.Extensions
                     TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact
                     {
-                        Name = "John Doe",
-                        Email = "John.Doe@gmail.com",
-                        Url = new Uri("https://twitter.com/johndoe"),
+                        Name = "Achara Obinna",
+                        Email = "obinna.achara@outlook.com",
+                        Url = new Uri("https://twitter.com/slimcent"),
                     },
                     License = new OpenApiLicense
                     {
@@ -171,14 +171,39 @@ namespace CompanyApi.Extensions
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 s.IncludeXmlComments(xmlPath);
 
+                s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Place to add JWT with Bearer",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                },
+                                Name = "Bearer",
+                        },
+                        new List<string>()
+                    }
+                });
+
             });
         }
 
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
-            var secretKey = Environment.GetEnvironmentVariable("SECRET");
-
+            //var secretKey = Environment.GetEnvironmentVariable("SECRET");
+            var secretKey = jwtSettings.GetSection("Secret").Value;
             services.AddAuthentication(opt => {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
