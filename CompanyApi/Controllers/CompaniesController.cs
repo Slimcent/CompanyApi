@@ -6,6 +6,7 @@ using Entities.DataTransferObjects;
 using Entities.Models;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace CompanyApi.Controllers
         /// <summary>
         /// Gets the list of all companies
         /// </summary>
-        [HttpGet(Name = "GetCompanies"), Authorize(Roles = "Manager")]
+        [HttpGet(Name = "GetCompanies"), /*Authorize(Roles = "Manager")*/]
         [ResponseCache(CacheProfileName = "120SecondsDuration")]
         public async Task<IActionResult> GetCompanies()
         {
@@ -152,7 +153,41 @@ namespace CompanyApi.Controllers
             _mapper.Map(company, companyEntity);
             await _unitOfWork.SaveAsync();
 
-            return NoContent();
+            return Ok(company);
+        }
+
+        [HttpPatch("{id}")]
+        [ServiceFilter(typeof(ValidationFiltering))]
+        [ServiceFilter(typeof(ValidateCompanyExists))]
+        public async Task<IActionResult> PatchCompany(Guid id, [FromBody] JsonPatchDocument<PatchCompanyDto> company)
+        {
+            //var companyEntity = HttpContext.Items["company"] as Company;
+
+            var companyEntity = await _unitOfWork.Company.GetCompanyAsync(id, trackChanges: false);
+            if (companyEntity == null)
+            {
+                _logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
+                return NotFound();
+            }
+
+            //var companyToPatch = _mapper.Map<PatchCompanyDto>(companyEntity);
+
+            var companyToPatch = new PatchCompanyDto
+            {
+                Name = companyEntity.Name,
+                Address = companyEntity.Address,
+                Country = companyEntity.Country,
+            };
+
+            company.ApplyTo(companyToPatch);
+
+            _mapper.Map(companyToPatch, companyEntity);
+
+            _unitOfWork.Company.UpdateCompany(companyEntity);
+
+            await _unitOfWork.SaveAsync();
+
+            return Ok(companyToPatch);
         }
 
 

@@ -28,7 +28,7 @@ namespace CompanyApi.Extensions
                         await context.Response.WriteAsync(new ErrorDetails()
                         {
                             StatusCode = context.Response.StatusCode,
-                            Message = "Internal Server Error."
+                            Message = contextFeature.Error.Message
                         }.ToString());
                     }
                 });

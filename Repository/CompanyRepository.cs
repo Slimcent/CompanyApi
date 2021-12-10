@@ -24,7 +24,8 @@ namespace Repository
             await FindByCondition(x => ids.Contains(x.Id), trackChanges).ToListAsync();
 
         public void AddCompany(Company company) => Add(company);
-        
+        public void UpdateCompany(Company company) => Update(company);
+
         public void DeleteCompany(Company company)
         {
             Delete(company);

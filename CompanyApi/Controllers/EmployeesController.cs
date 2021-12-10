@@ -5,6 +5,7 @@ using Entities.DataTransferObjects;
 using Entities.Models;
 using Entities.Pagination;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -128,7 +129,7 @@ namespace CompanyApi.Controllers
             _unitOfWork.Employee.DeleteEmployee(employeeForCompany);
             await _unitOfWork.SaveAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpPut("{id}")]
@@ -136,25 +137,46 @@ namespace CompanyApi.Controllers
         [ServiceFilter(typeof(ValidateEmployeeCompanyExists))]
         public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeUpdateDto employee)
         {
-            //var company = _unitOfWork.Company.GetCompanyAsync(companyId, trackChanges: false);
-            //if (company == null)
-            //{
-            //    _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
-            //    return NotFound();
-            //}
-            //var employeeEntity = await _unitOfWork.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
-            //if (employeeEntity == null)
-            //{
-            //    _logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
-            //    return NotFound();
-            //}
-
             var employeeEntity = HttpContext.Items["employee"] as Employee;
 
             _mapper.Map(employee, employeeEntity);
             await _unitOfWork.SaveAsync();
 
-            return NoContent();
+            return Ok(employee);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<PatchEmployeeDto> patchDoc)
+        {
+            var company = await _unitOfWork.Company.GetCompanyAsync(companyId, trackChanges: false);
+            if (company == null)
+            {
+                _logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
+                return NotFound();
+            }
+
+            var employeeEntity = await _unitOfWork.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
+            if (employeeEntity == null)
+            {
+                _logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
+                return NotFound();
+            }
+
+            //var employeeToPatch = _mapper.Map<PatchEmployeeDto>(employeeEntity);
+
+            var employeeToPatch = new PatchEmployeeDto
+            {
+                Name = employeeEntity.Name,
+                Age = employeeEntity.Age,
+                Position = employeeEntity.Position
+            };
+
+            patchDoc.ApplyTo(employeeToPatch);
+
+            _mapper.Map(employeeToPatch, employeeEntity);
+            await  _unitOfWork.SaveAsync();
+
+            return Ok(employeeToPatch);
         }
     }
 }

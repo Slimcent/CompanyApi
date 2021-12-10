@@ -18,6 +18,8 @@ namespace Entities.DataTransferObjects
             CreateMap<EmployeeUpdateDto, Employee>();
             CreateMap<CompanyUpdateDto, Company>();
             CreateMap<UserAddDto, User>();
+            CreateMap<PatchEmployeeDto, Employee>().ReverseMap();
+            CreateMap<PatchCompanyDto, Company>();
         }
     }
 }

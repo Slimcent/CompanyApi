@@ -70,7 +70,8 @@ namespace CompanyApi
                 {
                     Duration = 120
                 });
-            }).AddXmlDataContractSerializerFormatters()
+            }).AddNewtonsoftJson()
+              .AddXmlDataContractSerializerFormatters()
               .AddCustomCSVFormatter();
             services.Configure<ApiBehaviorOptions>(options =>
             {
