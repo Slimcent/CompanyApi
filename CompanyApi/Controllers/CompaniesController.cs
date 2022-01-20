@@ -161,14 +161,7 @@ namespace CompanyApi.Controllers
         [ServiceFilter(typeof(ValidateCompanyExists))]
         public async Task<IActionResult> PatchCompany(Guid id, [FromBody] JsonPatchDocument<PatchCompanyDto> company)
         {
-            //var companyEntity = HttpContext.Items["company"] as Company;
-
-            var companyEntity = await _unitOfWork.Company.GetCompanyAsync(id, trackChanges: false);
-            if (companyEntity == null)
-            {
-                _logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
-                return NotFound();
-            }
+            var companyEntity = HttpContext.Items["company"] as Company;
 
             //var companyToPatch = _mapper.Map<PatchCompanyDto>(companyEntity);
 
